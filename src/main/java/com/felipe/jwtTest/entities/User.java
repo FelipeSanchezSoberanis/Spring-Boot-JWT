@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +33,7 @@ public class User implements UserDetails {
   private boolean accountNonExpired;
   private boolean credentialsNonExpired;
   private boolean accountNonLocked;
-  private List<SimpleGrantedAuthority> authorities;
+  @Transient private List<SimpleGrantedAuthority> authorities;
 
   @ManyToMany
   @JoinTable(name = "roles_per_user")
