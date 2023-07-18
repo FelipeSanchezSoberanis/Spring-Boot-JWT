@@ -44,9 +44,10 @@ public class AuthenticationService {
     userAuthorities.toArray(userAuthoritiesArray);
 
     return JWT.create()
-        .withIssuer("app")
+        .withIssuer(JwtConstants.ISSUER)
         .withClaim("tokenType", "access")
         .withClaim("username", user.getUsername())
+        .withClaim("userId", user.getId())
         .withArrayClaim("authorities", userAuthoritiesArray)
         .withExpiresAt(Instant.now().plusMillis(JwtConstants.ACCESS_TOKEN_EXPIRATION_TIME))
         .sign(JwtConstants.ALGORITHM);
@@ -54,9 +55,10 @@ public class AuthenticationService {
 
   public String createRefreshToken(User user) {
     return JWT.create()
-        .withIssuer("app")
+        .withIssuer(JwtConstants.ISSUER)
         .withClaim("tokenType", "refresh")
         .withClaim("username", user.getUsername())
+        .withClaim("userId", user.getId())
         .withExpiresAt(Instant.now().plusMillis(JwtConstants.REFRESH_TOKEN_EXPIRATION_TIME))
         .sign(JwtConstants.ALGORITHM);
   }
