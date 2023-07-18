@@ -43,7 +43,7 @@ public class AuthController {
     return new ResponseEntity<>(loginResponse, HttpStatus.OK);
   }
 
-  @PostMapping("/getNewAccessToken")
+  @PostMapping("/refreshToken")
   public ResponseEntity<NewAccessTokenResponse> getNewAccessToken(
       @RequestBody NewAccessTokenRequest newAccessTokenRequest) {
     JWTVerifier jwtVerifier =

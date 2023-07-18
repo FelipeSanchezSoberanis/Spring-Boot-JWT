@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 public class WebSecurityConfig {
   @Autowired private PostgresUserDetailsService postgresUserDetailsService;
   @Autowired private ObjectMapper objectMapper;
@@ -29,9 +29,8 @@ public class WebSecurityConfig {
     http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     http.authorizeHttpRequests(
         r -> {
-          r.requestMatchers("/auth/login").permitAll();
+          r.requestMatchers("/auth/*").permitAll();
           r.requestMatchers("/test/public").permitAll();
-          r.requestMatchers("/actuator/**").permitAll();
           r.anyRequest().authenticated();
         });
     http.addFilterBefore(
