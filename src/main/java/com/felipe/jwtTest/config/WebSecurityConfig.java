@@ -26,6 +26,7 @@ public class WebSecurityConfig {
     http.authorizeHttpRequests(
         r -> {
           r.requestMatchers("/auth/login").permitAll();
+          r.requestMatchers("/test/public").permitAll();
           r.anyRequest().authenticated();
         });
 
