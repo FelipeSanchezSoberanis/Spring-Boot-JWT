@@ -32,6 +32,8 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.75'
+    implementation 'com.auth0:java-jwt:4.4.0'
 }
 
 tasks.named('test') {
