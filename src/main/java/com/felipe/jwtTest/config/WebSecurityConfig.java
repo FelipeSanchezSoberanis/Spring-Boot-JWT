@@ -29,8 +29,7 @@ public class WebSecurityConfig {
     http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     http.authorizeHttpRequests(
         r -> {
-          r.requestMatchers("/auth/*").permitAll();
-          r.requestMatchers("/test/public").permitAll();
+          PublicPaths.PATHS.forEach(p -> r.requestMatchers(p).permitAll());
           r.anyRequest().authenticated();
         });
     http.addFilterBefore(

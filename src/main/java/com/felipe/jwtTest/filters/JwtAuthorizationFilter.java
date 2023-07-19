@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.felipe.jwtTest.config.JwtConstants;
+import com.felipe.jwtTest.config.PublicPaths;
 import com.felipe.jwtTest.dtos.responses.ApiErrorResponse;
 import com.felipe.jwtTest.entities.User;
 import jakarta.servlet.FilterChain;
@@ -23,6 +24,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -36,13 +38,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-    if (authorizationHeader == null) {
+    // Skip this filter if path is public
+    boolean pathIsPublic =
+        PublicPaths.PATHS.stream()
+            .filter(p -> new AntPathRequestMatcher(p).matches(request))
+            .findFirst()
+            .isPresent();
+    if (pathIsPublic) {
       filterChain.doFilter(request, response);
       return;
     }
 
+    // Get access token from header and try to decode it. Return response if expired or invalid
+    String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     String accessToken = authorizationHeader.substring("Bearer".length() + 1);
 
     JWTVerifier jwtVerifier =
@@ -67,13 +75,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
       return;
     }
 
+    // Get user id and user authorities from decoded jwt and convert them to a list of simple
+    // granted authorities
     Long userId = decodedJWT.getClaim(JwtConstants.CLAIM_USER_ID).asLong();
     List<String> authoritiesAsStrings =
         decodedJWT.getClaim(JwtConstants.CLAIM_AUTHORITIES).asList(String.class);
-
     List<SimpleGrantedAuthority> authorities =
         authoritiesAsStrings.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
 
+    // Recreate logged in user from jwt data and set it in the security context
     User user = new User();
     user.setId(userId);
     user.setAuthorities(authorities);
