@@ -65,11 +65,6 @@ class JwtTestApplicationTests {
         HttpHeaders.AUTHORIZATION, "Bearer " + loginResponse.getBody().getAccessToken());
     ResponseEntity<Void> userResponse =
         restTemplate.exchange(
-
-
-
-
-
             appUrl("/test/private"), HttpMethod.GET, new HttpEntity<Void>(httpHeaders), Void.class);
 
     assertEquals(HttpStatus.OK, userResponse.getStatusCode());
