@@ -43,12 +43,14 @@ class JwtTestApplicationTests {
 
   @Test
   void testAccessingProtectedResource() {
+    // Unauthenticated request
     try {
       restTemplate.exchange(appUrl("/test/private"), HttpMethod.GET, null, Void.class);
     } catch (HttpClientErrorException e) {
       assertEquals(HttpStatus.FORBIDDEN, e.getStatusCode());
     }
 
+    // Login
     LoginRequest loginRequest = new LoginRequest("user", "password");
     ResponseEntity<LoginResponse> loginResponse =
         restTemplate.exchange(
@@ -57,6 +59,7 @@ class JwtTestApplicationTests {
             new HttpEntity<>(loginRequest),
             LoginResponse.class);
 
+    // Authenticated request
     HttpHeaders httpHeaders = new HttpHeaders();
     httpHeaders.add(
         HttpHeaders.AUTHORIZATION, "Bearer " + loginResponse.getBody().getAccessToken());
