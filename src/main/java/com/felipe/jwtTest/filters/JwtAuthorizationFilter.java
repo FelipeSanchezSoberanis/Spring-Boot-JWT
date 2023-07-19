@@ -52,17 +52,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     try {
       decodedJWT = jwtVerifier.verify(accessToken);
     } catch (TokenExpiredException ex) {
-      ApiErrorResponse apiErrorResponse = new ApiErrorResponse();
-      apiErrorResponse.setMessage("Expired access token");
-
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      response.getWriter().write(objectMapper.writeValueAsString(apiErrorResponse));
-      response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-      filterChain.doFilter(request, response);
+      sendResponse("Expired access token", HttpStatus.UNAUTHORIZED, response);
       return;
     } catch (JWTVerificationException ex) {
-      filterChain.doFilter(request, response);
+      sendResponse("Broken jwt", HttpStatus.BAD_REQUEST, response);
+      return;
+    }
+
+    if (decodedJWT.getClaim("tokenType").asString().equals("refresh")) {
+      sendResponse("Use the access token", HttpStatus.BAD_REQUEST, response);
+
       return;
     }
 
@@ -81,5 +80,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     filterChain.doFilter(request, response);
+  }
+
+  private void sendResponse(String message, HttpStatus status, HttpServletResponse response)
+      throws IOException {
+    ApiErrorResponse apiErrorResponse = new ApiErrorResponse();
+    apiErrorResponse.setMessage(message);
+
+    response.setStatus(status.value());
+    response.getWriter().write(objectMapper.writeValueAsString(apiErrorResponse));
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
   }
 }
