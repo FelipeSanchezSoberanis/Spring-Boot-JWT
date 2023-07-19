@@ -59,14 +59,17 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
       return;
     }
 
-    if (decodedJWT.getClaim("tokenType").asString().equals("refresh")) {
+    if (decodedJWT
+        .getClaim(JwtConstants.CLAIM_TOKEN_TYPE)
+        .asString()
+        .equals(JwtConstants.TOKEN_TYPE_REFRESH)) {
       sendResponse("Use the access token", HttpStatus.BAD_REQUEST, response);
-
       return;
     }
 
-    Long userId = decodedJWT.getClaim("userId").asLong();
-    List<String> authoritiesAsStrings = decodedJWT.getClaim("authorities").asList(String.class);
+    Long userId = decodedJWT.getClaim(JwtConstants.CLAIM_USER_ID).asLong();
+    List<String> authoritiesAsStrings =
+        decodedJWT.getClaim(JwtConstants.CLAIM_AUTHORITIES).asList(String.class);
 
     List<SimpleGrantedAuthority> authorities =
         authoritiesAsStrings.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());

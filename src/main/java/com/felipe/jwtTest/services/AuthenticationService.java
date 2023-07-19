@@ -45,10 +45,10 @@ public class AuthenticationService {
 
     return JWT.create()
         .withIssuer(JwtConstants.ISSUER)
-        .withClaim("tokenType", "access")
-        .withClaim("username", user.getUsername())
-        .withClaim("userId", user.getId())
-        .withArrayClaim("authorities", userAuthoritiesArray)
+        .withClaim(JwtConstants.CLAIM_TOKEN_TYPE, JwtConstants.TOKEN_TYPE_ACCESS)
+        .withClaim(JwtConstants.CLAIM_USERNAME, user.getUsername())
+        .withClaim(JwtConstants.CLAIM_USER_ID, user.getId())
+        .withArrayClaim(JwtConstants.CLAIM_AUTHORITIES, userAuthoritiesArray)
         .withExpiresAt(Instant.now().plusMillis(JwtConstants.ACCESS_TOKEN_EXPIRATION_TIME))
         .sign(JwtConstants.ALGORITHM);
   }
@@ -56,9 +56,9 @@ public class AuthenticationService {
   public String createRefreshToken(User user) {
     return JWT.create()
         .withIssuer(JwtConstants.ISSUER)
-        .withClaim("tokenType", "refresh")
-        .withClaim("username", user.getUsername())
-        .withClaim("userId", user.getId())
+        .withClaim(JwtConstants.CLAIM_TOKEN_TYPE, JwtConstants.TOKEN_TYPE_REFRESH)
+        .withClaim(JwtConstants.CLAIM_USERNAME, user.getUsername())
+        .withClaim(JwtConstants.CLAIM_USER_ID, user.getId())
         .withExpiresAt(Instant.now().plusMillis(JwtConstants.REFRESH_TOKEN_EXPIRATION_TIME))
         .sign(JwtConstants.ALGORITHM);
   }
